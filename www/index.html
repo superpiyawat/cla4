@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title></title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <!-- un-comment this code to enable service worker
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(() => console.log('service worker installed'))
+          .catch(err => console.log('Error', err));
+      }
+    </script>-->
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
+    <link href="css/ionic.app.css" rel="stylesheet">
+    -->
+
+    <!-- ionic/angularjs js -->
+    <script src="lib/ionic/js/ionic.bundle.js"></script>
+
+    <!-- cordova script (this will be a 404 during development) -->
+    <script src="cordova.js"></script>
+
+
+    <!-- your app's js -->
+    <script src="js/app.js"></script>
+  </head>
+  <body ng-app="starter">
+
+        <ion-tab 0="" title="กระดานบอร์ด">
+          <ion-header-bar>
+            <!DOCTYPE html>
+<html lang="en" ng-app="">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/master.css">
+    <link rel="stylesheet" href="css/prism.css">
+    <style>
+      pre { margin-left: 15px !important }
+    </style>
+
+    <!--[if lt IE 9]>
+      <script src="../lib/excanvas.js"></script>
+    <![endif]-->
+
+  <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script>
+      (function() {
+        var fabricUrl = 'fabric.js';
+        if (document.location.search.indexOf('load_fabric_from=') > -1) {
+          var match = document.location.search.match(/load_fabric_from=([^&]*)/);
+          if (match && match[1]) {
+
+            fabricUrl = match[1];
+          }
+        }
+        document.write('<script src="' + fabricUrl + '"><\/script>');
+      })();
+    </script>
+  <!--  <script src="../js/master.js"></script> -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
+  </head>
+  <body>
+
+<script>
+$(function() {
+
+  if (document.location.hostname === 'localhost') {
+    var links = document.getElementById('header').getElementsByTagName('a');
+    for (var i = 0, len = links.length; i < len; i++) {
+      // very retarted fix but fuck it
+      links[i].href = links[i].href.replace('fabricjs.com', 'localhost:4000');
+    }
+  }
+  else {
+    var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+    s.async = true;
+    s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+    t.parentNode.insertBefore(s, t);
+
+    !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+  }
+})();
+</script>
+
+    <div id="bd-wrapper" ng-controller="CanvasControls">
+
+
+      <style>
+#drawing-mode {
+  margin-bottom: 10px;
+  vertical-align: top;
+}
+#drawing-mode-options {
+  display: inline-block;
+  vertical-align: top;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  background: #f5f2f0;
+  padding: 10px;
+}
+label {
+  display: inline-block; width: 130px;
+}
+.info {
+  display: inline-block;
+  width: 25px;
+  background: #ffc;
+}
+#bd-wrapper {
+  min-width: 1500px;
+}
+</style>
+
+<canvas id="c" width="400" height="300" style="border:1px solid #aaa"></canvas>
+
+<div style="display: inline-block; margin-left: 10px">
+  <button id="drawing-mode" class="btn btn-info">Cancel drawing mode</button><br>
+  <button id="clear-canvas" class="btn btn-info">Clear</button><br>
+  <button id="remove1">remove</button><br>
+
+
+
+
+    <br>
+</a>
+
+
+
+
+  </div>
+
+
+  <div>
+      <button id="shape1">circle</button>
+      <button id="shape2">square</button>
+      <button id="triangle1">triangle</button>
+      <button id="text1">text</button>
+
+  </div>
+
+
+</div>
+
+
+<script id="main">(function() {
+  var socket = io("http://10.0.11.82:3000");
+  socket.emit("pao", "hello");
+
+
+
+  var $ = function(id){return document.getElementById(id)};
+
+  var canvas = this.__canvas = new fabric.Canvas('c');
+  console.log('hellocanvas',canvas);
+   fabric.Object.prototype.transparentCorners = false;
+
+   canvas.onclick = function() {
+     console.log("canvas");
+     socket.emit("canvas", true);
+
+    };
+
+    socket.on("clientCanvas", function(msg){
+     console.log("clientCanvas");
+  	  if (msg) {
+
+     }
+  	});
+
+  var drawingModeEl = $('drawing-mode'),
+      drawingOptionsEl = $('drawing-mode-options'),
+      drawingColorEl = $('drawing-color'),
+      drawingShadowColorEl = $('drawing-shadow-color'),
+      drawingLineWidthEl = $('drawing-line-width'),
+      drawingShadowWidth = $('drawing-shadow-width'),
+      drawingShadowOffset = $('drawing-shadow-offset'),
+      clearEl = $('clear-canvas');
+      shapeE1 = $('shape1');
+      squareE1 = $('shape2');
+      textE1 = $('text1');
+      TriangleE1 = $('triangle1');
+      RemoveE1 = $('remove1');
+
+
+  textE1.onclick = function() {
+    console.log("textE1");
+    socket.emit("textE1", true);
+
+   };
+
+   socket.on("clientTextE1", function(msg){
+    console.log("clientTextE1");
+ 	  if (msg) {
+        canvas.add(new fabric.IText('Tap and Type', {
+          fontFamily: 'arial black',
+          fontSize: 40,
+          left: 100,
+          top: 100 ,
+        }));
+    }
+ 	});
+
+
+  shapeE1.onclick = function() {
+    console.log("ส่งค่าคลิกวงกลมมาแล้ว");
+    socket.emit("shapeE1", true);
+
+   };
+
+   socket.on("clientCircleE1", function(msg){
+    console.log("clientCircleE1");
+    if (msg) {
+      canvas.add(new fabric.Circle({
+        radius: 30,
+        fill:  'rgba(255,0,0,0.5)',
+        top: 100,
+        left: 100
+
+      }));
+
+      canvas.selectionColor = 'rgba(255,0,0,0.5)';
+      canvas.selectionBorderColor = 'red';
+      canvas.selectionLineWidth = 5;
+      this.__canvases.push(canvas);
+
+    };
+
+ 	});
+
+
+  squareE1.onclick = function() {
+    console.log("ส่งค่าคลิกสี่เหลี่ยมมาแล้ว");
+    socket.emit("squareE1", true);
+   };
+   socket.on("clientSquareE1", function(msg){
+    console.log("clientSquareE1");
+    if (msg) {
+          canvas.add(new fabric.Rect({
+            width: 50,
+            height: 50,
+            fill: 'rgba(0,200,0,0.5)',
+            top: 100,
+            left: 100
+
+          }));
+          canvas.item(0).lockRotation = true;
+          this.__canvases.push(canvas);
+
+    };
+
+ 	});
+
+
+  TriangleE1.onclick = function() {
+    console.log("ส่งค่าคลิกสามเหลี่ยมมาแล้ว");
+    socket.emit("TriangleE1", true);
+   };
+   socket.on("clientTriangleE1", function(msg){
+    console.log("clientTriangleE1");
+    if (msg) {
+
+        canvas.add(new fabric.Triangle({
+          width: 50,
+          height: 50,
+          fill: 'rgba(0,0,200,0.5)',
+          top: 100,
+          left: 100
+        }));
+      };
+
+ 	});
+
+  RemoveE1.onclick = function() {
+    console.log("RemoveE1");
+    socket.emit("RemoveE1", true);
+   };
+   socket.on("clientRemoveE1", function(msg){
+    console.log("clientRemoveE1");
+    if (msg) {canvas.remove(canvas.getActiveObject());
+      };
+
+  });
+
+  clearEl.onclick = function() {
+    console.log("clearEl");
+    socket.emit("clearEl", true);
+   };
+   socket.on("clientClearEl", function(msg){
+    console.log("clientClearEl");
+    if (msg) {canvas.clear()
+      };
+
+  });
+
+  drawingModeEl.onclick = function() {
+    console.log("drawingModeEl");
+    socket.emit("drawingModeEl", true);
+   };
+   socket.on("clientDrawingModeEl", function(msg){
+    console.log("clientDrawingModeEl");
+    if (msg) {
+      canvas.isDrawingMode = !canvas.isDrawingMode;
+      if (canvas.isDrawingMode) {
+        drawingModeEl.innerHTML = 'Cancel drawing mode';
+        drawingOptionsEl.style.display = '';
+      }
+      else {
+        drawingModeEl.innerHTML = 'Enter drawing mode';
+        drawingOptionsEl.style.display = 'none';
+      }
+      };
+
+  });
+
+
+
+
+
+
+  if (fabric.PatternBrush) {
+    var vLinePatternBrush = new fabric.PatternBrush(canvas);
+    vLinePatternBrush.getPatternSrc = function() {
+
+      var patternCanvas = fabric.document.createElement('canvas');
+      patternCanvas.width = patternCanvas.height = 10;
+      var ctx = patternCanvas.getContext('2d');
+
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(0, 5);
+      ctx.lineTo(10, 5);
+      ctx.closePath();
+      ctx.stroke();
+
+      return patternCanvas;
+    };
+
+    var hLinePatternBrush = new fabric.PatternBrush(canvas);
+    hLinePatternBrush.getPatternSrc = function() {
+
+      var patternCanvas = fabric.document.createElement('canvas');
+      patternCanvas.width = patternCanvas.height = 10;
+      var ctx = patternCanvas.getContext('2d');
+
+      ctx.strokeStyle = this.color;
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(5, 0);
+      ctx.lineTo(5, 10);
+      ctx.closePath();
+      ctx.stroke();
+
+      return patternCanvas;
+    };
+
+    var squarePatternBrush = new fabric.PatternBrush(canvas);
+    squarePatternBrush.getPatternSrc = function() {
+
+      var squareWidth = 10, squareDistance = 2;
+
+      var patternCanvas = fabric.document.createElement('canvas');
+      patternCanvas.width = patternCanvas.height = squareWidth + squareDistance;
+      var ctx = patternCanvas.getContext('2d');
+
+      ctx.fillStyle = this.color;
+      ctx.fillRect(0, 0, squareWidth, squareWidth);
+
+      return patternCanvas;
+    };
+
+    var diamondPatternBrush = new fabric.PatternBrush(canvas);
+    diamondPatternBrush.getPatternSrc = function() {
+
+      var squareWidth = 10, squareDistance = 5;
+      var patternCanvas = fabric.document.createElement('canvas');
+      var rect = new fabric.Rect({
+        width: squareWidth,
+        height: squareWidth,
+        angle: 45,
+        fill: this.color
+      });
+
+      var canvasWidth = rect.getBoundingRectWidth();
+
+      patternCanvas.width = patternCanvas.height = canvasWidth + squareDistance;
+      rect.set({ left: canvasWidth / 2, top: canvasWidth / 2 });
+
+      var ctx = patternCanvas.getContext('2d');
+      rect.render(ctx);
+
+      return patternCanvas;
+    };
+
+    var img = new Image();
+    img.src = '../assets/honey_im_subtle.png';
+
+    var texturePatternBrush = new fabric.PatternBrush(canvas);
+    texturePatternBrush.source = img;
+  }
+/*
+  $('drawing-mode-selector').onchange = function() {
+
+    if (this.value === 'hline') {
+      canvas.freeDrawingBrush = vLinePatternBrush;
+    }
+    else if (this.value === 'vline') {
+      canvas.freeDrawingBrush = hLinePatternBrush;
+    }
+    else if (this.value === 'square') {
+      canvas.freeDrawingBrush = squarePatternBrush;
+    }
+    else if (this.value === 'diamond') {
+      canvas.freeDrawingBrush = diamondPatternBrush;
+    }
+    else if (this.value === 'texture') {
+      canvas.freeDrawingBrush = texturePatternBrush;
+    }
+    else {
+      canvas.freeDrawingBrush = new fabric[this.value + 'Brush'](canvas);
+    }
+
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.color = drawingColorEl.value;
+      canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
+      canvas.freeDrawingBrush.shadowBlur = parseInt(drawingShadowWidth.value, 10) || 0;
+    }
+  };
+*/
+  drawingColorEl.onchange = function() {
+    canvas.freeDrawingBrush.color = this.value;
+  };
+  drawingShadowColorEl.onchange = function() {
+    canvas.freeDrawingBrush.shadowColor = this.value;
+  };
+  drawingLineWidthEl.onchange = function() {
+    canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+    this.previousSibling.innerHTML = this.value;
+  };
+  drawingShadowWidth.onchange = function() {
+    canvas.freeDrawingBrush.shadowBlur = parseInt(this.value, 10) || 0;
+    this.previousSibling.innerHTML = this.value;
+  };
+  drawingShadowOffset.onchange = function() {
+    canvas.freeDrawingBrush.shadowOffsetX =
+    canvas.freeDrawingBrush.shadowOffsetY = parseInt(this.value, 10) || 0;
+    this.previousSibling.innerHTML = this.value;
+  };
+
+  if (canvas.freeDrawingBrush) {
+    canvas.freeDrawingBrush.color = drawingColorEl.value;
+    canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
+    canvas.freeDrawingBrush.shadowBlur = 0;
+  }
+})();
+</script>
+
+    </div>
+
+
+
+    <script>
+(function() {
+  fabric.util.addListener(fabric.window, 'load', function() {
+    var canvas = this.__canvas || this.canvas,
+        canvases = this.__canvases || this.canvases;
+
+    canvas && canvas.calcOffset && canvas.calcOffset();
+
+    if (canvases && canvases.length) {
+      for (var i = 0, len = canvases.length; i < len; i++) {
+        canvases[i].calcOffset();
+      }
+    }
+  });
+})();
+</script>
+
+
+
+
+  </body>
+</html>
+
+
+            <script>
+
+
+            </script>
+
+
+
+
+            </ion-header-bar></ion-tab></body></html>
+
+          <ion-content padding="true">
+
+
+
+
+
+          </ion-content>
