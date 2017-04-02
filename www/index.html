@@ -153,7 +153,7 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://192.168.1.13:3000");
+  var socket = io("http://192.168.1.9:3000");
   socket.emit("pao", "hello");
 
 
@@ -189,7 +189,7 @@ label {
 
   socket.on("m2", function(msg){
    console.log("m2");
-    if (evt) {
+    if (msg) {
 
    }
   });
@@ -212,32 +212,35 @@ label {
 
 
   textE1.onclick = function() {
-    console.log("textE1");
+  //  console.log("textE1");
     socket.emit("textE1", true);
 
    };
 
    socket.on("clientTextE1", function(msg){
-    console.log("clientTextE1");
+    //console.log("clientTextE1");
  	  if (msg) {
         canvas.add(new fabric.IText('Tap and Type', {
+          id:'text1',
           fontFamily: 'arial black',
           fontSize: 40,
           left: 100,
           top: 100 ,
         }));
+
+
     }
  	});
 
 
   shapeE1.onclick = function() {
-    console.log("ส่งค่าคลิกวงกลมมาแล้ว");
+  //  console.log("ส่งค่าคลิกวงกลมมาแล้ว");
     socket.emit("shapeE1", true);
 
    };
 
    socket.on("clientCircleE1", function(msg){
-    console.log("clientCircleE1");
+    //console.log("clientCircleE1");
     if (msg) {
       canvas.add(new fabric.Circle({
         radius: 30,
@@ -258,11 +261,11 @@ label {
 
 
   squareE1.onclick = function() {
-    console.log("ส่งค่าคลิกสี่เหลี่ยมมาแล้ว");
+  //  console.log("ส่งค่าคลิกสี่เหลี่ยมมาแล้ว");
     socket.emit("squareE1", true);
    };
    socket.on("clientSquareE1", function(msg){
-    console.log("clientSquareE1");
+    //console.log("clientSquareE1");
     if (msg) {
           canvas.add(new fabric.Rect({
             width: 50,
@@ -281,22 +284,34 @@ label {
 
 
   TriangleE1.onclick = function() {
-    console.log("ส่งค่าคลิกสามเหลี่ยมมาแล้ว");
+    //console.log("ส่งค่าคลิกสามเหลี่ยมมาแล้ว");
     socket.emit("TriangleE1", true);
    };
+
    socket.on("clientTriangleE1", function(msg){
-    console.log("clientTriangleE1");
+  //  console.log("clientTriangleE1");
     if (msg) {
 
         canvas.add(new fabric.Triangle({
+          id: 'Trian',
           width: 50,
           height: 50,
           fill: 'rgba(0,0,200,0.5)',
           top: 100,
           left: 100
-        }));
-      };
 
+        }));
+        var SelectObject = function (ObjectName) {
+            canvas.getObjects().forEach(function(o) {
+              console.log(o);
+                if(o.id === ObjectName) {
+                    canvas.setActiveObject(o);
+                }
+            })
+        }
+
+
+      };
  	});
 
   RemoveE1.onclick = function() {
