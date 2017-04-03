@@ -145,6 +145,7 @@ label {
       <button id="shape2">square</button>
       <button id="triangle1">triangle</button>
       <button id="text1">text</button>
+      <button id="test1">test1</button>
 
   </div>
 
@@ -153,7 +154,7 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://192.168.1.9:3000");
+  var socket = io("http://192.168.1.8:3000");
   socket.emit("pao", "hello");
 
 
@@ -217,19 +218,27 @@ label {
 
    };
 
+
    socket.on("clientTextE1", function(msg){
     //console.log("clientTextE1");
  	  if (msg) {
         canvas.add(new fabric.IText('Tap and Type', {
-          id:'text1',
+          id: '$password',
           fontFamily: 'arial black',
           fontSize: 40,
           left: 100,
           top: 100 ,
         }));
-
-
     }
+
+    var SelectObject = function (ObjectName) {
+    canvas.getObjects().forEach(function(o) {
+        if(o.id === ObjectName) {
+            canvas.setActiveObject(o);
+        }
+    })
+}
+    console.log(canvas.getObjects())
  	});
 
 
@@ -288,6 +297,7 @@ label {
     socket.emit("TriangleE1", true);
    };
 
+
    socket.on("clientTriangleE1", function(msg){
   //  console.log("clientTriangleE1");
     if (msg) {
@@ -309,7 +319,7 @@ label {
                 }
             })
         }
-
+        console.log(canvas.getObjects())
 
       };
  	});
@@ -519,6 +529,7 @@ label {
     }
   });
 })();
+
 </script>
 
 
