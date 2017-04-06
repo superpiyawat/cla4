@@ -192,8 +192,9 @@ label {
     var obj = movingObject;
      console.log("moving"+" X update="+x+" Y update"+y);
     if (msg) {
-        temptarget.set('left',x);
-        temptarget.set('top',y);
+      console.log(temptarget);
+      temptarget.top = x;
+      temptarget.left = y;
    }
   });
 
