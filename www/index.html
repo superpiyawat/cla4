@@ -154,7 +154,7 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://192.168.1.8:3000");
+  var socket = io("http://192.168.43.89:3000");
   socket.emit("pao", "hello");
 
 
@@ -179,19 +179,21 @@ label {
   	});
 
     //ส่งค่าพิกัดไป server ครับ
+    var temptarget;
     canvas.on('object:moving',function (msg) {
         var movingObject = msg.target;
         console.log(movingObject.get('left'), movingObject.get('top'));
-
-      socket.emit("movingObject", true);
-      console.log("moving");
+      socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),msg.target);
+      temptarget = movingObject;
         }
   );
 
-  socket.on("m2", function(msg){
-   console.log("m2");
+  socket.on("m2", function(msg,x,y,movingObject){
+    var obj = movingObject;
+     console.log("moving"+" X update="+x+" Y update"+y);
     if (msg) {
-
+        temptarget.set('left',x);
+        temptarget.set('top',y);
    }
   });
 
@@ -217,17 +219,22 @@ label {
     socket.emit("textE1", true);
 
    };
-
+    var textn=0;
+    var trin=0;
+    var sqn=0;
+    var cirn=0;
 
    socket.on("clientTextE1", function(msg){
     //console.log("clientTextE1");
+    textn=textn+1;
  	  if (msg) {
         canvas.add(new fabric.IText('Tap and Type', {
-          id: '$password',
+          id: 'text'+textn,
           fontFamily: 'arial black',
           fontSize: 40,
           left: 100,
           top: 100 ,
+
         }));
     }
 
@@ -250,8 +257,10 @@ label {
 
    socket.on("clientCircleE1", function(msg){
     //console.log("clientCircleE1");
+    cirn=cirn+1;
     if (msg) {
       canvas.add(new fabric.Circle({
+        id: 'cir'+cirn,
         radius: 30,
         fill:  'rgba(255,0,0,0.5)',
         top: 100,
@@ -273,10 +282,13 @@ label {
   //  console.log("ส่งค่าคลิกสี่เหลี่ยมมาแล้ว");
     socket.emit("squareE1", true);
    };
+
    socket.on("clientSquareE1", function(msg){
     //console.log("clientSquareE1");
+    sqn=sqn+1;
     if (msg) {
           canvas.add(new fabric.Rect({
+            id: 'sqare'+sqn,
             width: 50,
             height: 50,
             fill: 'rgba(0,200,0,0.5)',
@@ -301,9 +313,9 @@ label {
    socket.on("clientTriangleE1", function(msg){
   //  console.log("clientTriangleE1");
     if (msg) {
-
+      trin=trin+1;
         canvas.add(new fabric.Triangle({
-          id: 'Trian',
+          id: 'Trian'+trin,
           width: 50,
           height: 50,
           fill: 'rgba(0,0,200,0.5)',
@@ -336,6 +348,10 @@ label {
   });
 
   clearEl.onclick = function() {
+    textn=0;
+    trin=0;
+    sqn=0;
+    cirn=0;
     console.log("clearEl");
     socket.emit("clearEl", true);
    };
