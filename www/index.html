@@ -32,6 +32,7 @@
 
     <!-- your app's js -->
     <script src="js/app.js"></script>
+
   </head>
   <body ng-app="starter">
 
@@ -154,7 +155,7 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://192.168.43.89:3000");
+  var socket = io("http://192.168.1.95:3000");
   socket.emit("pao", "hello");
 
 
@@ -183,22 +184,34 @@ label {
     canvas.on('object:moving',function (msg) {
         var movingObject = msg.target;
         console.log(movingObject.get('left'), movingObject.get('top'));
-      socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),msg.target);
-      temptarget = movingObject;
+        temptarget = movingObject;
+      socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),temptarget.id,temptarget);
+      console.log(canvas);
         }
   );
 
-  socket.on("m2", function(msg,x,y,movingObject){
-    var obj = movingObject;
-     console.log("moving"+" X update="+x+" Y update"+y);
-    if (msg) {
-      console.log(temptarget);
-      temptarget.top = x;
-      temptarget.left = y;
-   }
+  socket.on("m2", function(msg,x,y,movingObject,mtr){
+    temptarget= movingObject;
+    //console.log(canvas._objects[0].id);
+    //console.log(movingObject);
+    //console.log(mtr);
+     //console.log("moving"+" X update="+x+" Y update"+y);
+      //console.log(temptarget);
+      for (var i = 0; i < canvas._objects.length; i++) {
+
+        if (canvas._objects[i].id==movingObject)
+        {
+          canvas._objects[i].top=y;
+          canvas._objects[i].left=x;
+
+
+
+
+        }
+      }
+
+
   });
-
-
 
   var drawingModeEl = $('drawing-mode'),
       drawingOptionsEl = $('drawing-mode-options'),
@@ -272,7 +285,7 @@ label {
       canvas.selectionColor = 'rgba(255,0,0,0.5)';
       canvas.selectionBorderColor = 'red';
       canvas.selectionLineWidth = 5;
-      this.__canvases.push(canvas);
+
 
     };
 
@@ -298,7 +311,7 @@ label {
 
           }));
           canvas.item(0).lockRotation = true;
-          this.__canvases.push(canvas);
+
 
     };
 
