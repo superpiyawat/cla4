@@ -183,28 +183,34 @@ label {
 
     //ส่งค่าพิกัดไป server ครับ
     var temptarget;
+    var test;
     canvas.on('object:moving',function (msg) {
         var movingObject = msg.target;
-        console.log(movingObject.get('left'), movingObject.get('top'));
+        //console.log(movingObject.get('left'), movingObject.get('top'));
         temptarget = movingObject;
-      socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),temptarget.id,temptarget);
+      socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),temptarget.id,temptarget,movingObject);
       console.log(canvas);
+      test = movingObject;
         }
   );
 
-  socket.on("m2", function(msg,x,y,movingObject,mtr){
+  socket.on("m2", function(msg,x,y,movingObject,mtr,mb){
     temptarget= movingObject;
     //console.log(canvas._objects[0].id);
     //console.log(movingObject);
     //console.log(mtr);
      //console.log("moving"+" X update="+x+" Y update"+y);
-      //console.log(temptarget);
+      //console.log(test);
+      //console.log(mb);
       for (var i = 0; i < canvas._objects.length; i++) {
 
         if (canvas._objects[i].id==movingObject)
         {
+
           canvas._objects[i].top=y;
           canvas._objects[i].left=x;
+          canvas._objects[i].oCoords=mb.oCoords;
+          canvas._objects[i].absoluteCoords=mb.absoluteCoords;
         }
         canvas.renderAll();
 
@@ -212,6 +218,36 @@ label {
 
 
   });
+  var temp2;
+  canvas.on('object:modified',function (msg) {
+      var movingObject = msg.target;
+      //console.log(movingObject.get('left'), movingObject.get('top'));
+      //console.log(movingObject.get('cacheWidth'),movingObject.get('cacheHeight'));
+      socket.emit("scalingObject",true, movingObject.cacheWidth, movingObject.cacheHeight, movingObject.id,movingObject,movingObject.text,movingObject._textBeforeEdit);
+    //console.log(canvas);s
+      }
+);
+
+socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
+  console.log("width = "+w+"Height= "+h);
+  //console.log(movingObject);
+  //console.log(mb);
+    for (var i = 0; i < canvas._objects.length; i++) {
+      if (canvas._objects[i].id==movingObject)
+      {
+
+        canvas._objects[i].cacheWidth=w;
+        canvas._objects[i].cacheHeight=h;
+        canvas._objects[i].text=text;
+        canvas._objects[i]._savedProps=mb._saveProps;
+        canvas._objects[i]._textBeforeEdit=bt;
+        canvas._updateCacheCanvas;
+        break;
+      }
+
+    }
+    canvas.renderAll();
+ });
 
 
 
@@ -244,7 +280,7 @@ label {
     //console.log("clientTextE1");
     textn=textn+1;
  	  if (msg) {
-        canvas.add(new fabric.IText('Tap and Type', {
+        canvas.add(new fabric.IText('Tap and Typ', {
           id: 'text'+textn,
           fontFamily: 'arial black',
           fontSize: 40,
