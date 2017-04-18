@@ -32,6 +32,7 @@
 
     <!-- your app's js -->
     <script src="js/app.js"></script>
+
   </head>
   <body ng-app="starter">
 
@@ -145,6 +146,7 @@ label {
       <button id="shape2">square</button>
       <button id="triangle1">triangle</button>
       <button id="text1">text</button>
+      <button id="test1">test1</button>
 
   </div>
 
@@ -153,15 +155,17 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://192.168.1.13:3000");
+  var socket = io("http://192.168.43.89:3000");
   socket.emit("pao", "hello");
-
-
 
   var $ = function(id){return document.getElementById(id)};
 
   var canvas = this.__canvas = new fabric.Canvas('c');
+
   console.log('hellocanvas',canvas);
+
+
+
    fabric.Object.prototype.transparentCorners = false;
 
    canvas.onclick = function() {
@@ -178,21 +182,72 @@ label {
   	});
 
     //ส่งค่าพิกัดไป server ครับ
+    var temptarget;
+    var test;
     canvas.on('object:moving',function (msg) {
         var movingObject = msg.target;
-        console.log(movingObject.get('left'), movingObject.get('top'));
-
-      socket.emit("movingObject", true);
-      console.log("moving");
+        //console.log(movingObject.get('left'), movingObject.get('top'));
+        temptarget = movingObject;
+      socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),temptarget.id,temptarget,movingObject);
+      console.log(canvas);
+      test = movingObject;
         }
   );
 
-  socket.on("m2", function(msg){
-   console.log("m2");
-    if (evt) {
+  socket.on("m2", function(msg,x,y,movingObject,mtr,mb){
+    temptarget= movingObject;
+    //console.log(canvas._objects[0].id);
+    //console.log(movingObject);
+    //console.log(mtr);
+     //console.log("moving"+" X update="+x+" Y update"+y);
+      //console.log(test);
+      //console.log(mb);
+      for (var i = 0; i < canvas._objects.length; i++) {
 
-   }
+        if (canvas._objects[i].id==movingObject)
+        {
+
+          canvas._objects[i].top=y;
+          canvas._objects[i].left=x;
+          canvas._objects[i].oCoords=mb.oCoords;
+          canvas._objects[i].absoluteCoords=mb.absoluteCoords;
+        }
+        canvas.renderAll();
+
+      }
+
+
   });
+  var temp2;
+  canvas.on('object:modified',function (msg) {
+      var movingObject = msg.target;
+      //console.log(movingObject.get('left'), movingObject.get('top'));
+      //console.log(movingObject.get('cacheWidth'),movingObject.get('cacheHeight'));
+      socket.emit("scalingObject",true, movingObject.cacheWidth, movingObject.cacheHeight, movingObject.id,movingObject,movingObject.text,movingObject._textBeforeEdit);
+    //console.log(canvas);s
+      }
+);
+
+socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
+  console.log("width = "+w+"Height= "+h);
+  //console.log(movingObject);
+  //console.log(mb);
+    for (var i = 0; i < canvas._objects.length; i++) {
+      if (canvas._objects[i].id==movingObject)
+      {
+
+        canvas._objects[i].cacheWidth=w;
+        canvas._objects[i].cacheHeight=h;
+        canvas._objects[i].text=text;
+        canvas._objects[i]._savedProps=mb._saveProps;
+        canvas._objects[i]._textBeforeEdit=bt;
+        canvas._updateCacheCanvas;
+        break;
+      }
+
+    }
+    canvas.renderAll();
+ });
 
 
 
@@ -212,34 +267,52 @@ label {
 
 
   textE1.onclick = function() {
-    console.log("textE1");
+  //  console.log("textE1");
     socket.emit("textE1", true);
 
    };
+    var textn=0;
+    var trin=0;
+    var sqn=0;
+    var cirn=0;
 
    socket.on("clientTextE1", function(msg){
-    console.log("clientTextE1");
+    //console.log("clientTextE1");
+    textn=textn+1;
  	  if (msg) {
-        canvas.add(new fabric.IText('Tap and Type', {
+        canvas.add(new fabric.IText('Tap and Typ', {
+          id: 'text'+textn,
           fontFamily: 'arial black',
           fontSize: 40,
           left: 100,
           top: 100 ,
+
         }));
     }
+
+    var SelectObject = function (ObjectName) {
+    canvas.getObjects().forEach(function(o) {
+        if(o.id === ObjectName) {
+            canvas.setActiveObject(o);
+        }
+    })
+}
+    console.log(canvas.getObjects())
  	});
 
 
   shapeE1.onclick = function() {
-    console.log("ส่งค่าคลิกวงกลมมาแล้ว");
+  //  console.log("ส่งค่าคลิกวงกลมมาแล้ว");
     socket.emit("shapeE1", true);
 
    };
 
    socket.on("clientCircleE1", function(msg){
-    console.log("clientCircleE1");
+    //console.log("clientCircleE1");
+    cirn=cirn+1;
     if (msg) {
       canvas.add(new fabric.Circle({
+        id: 'cir'+cirn,
         radius: 30,
         fill:  'rgba(255,0,0,0.5)',
         top: 100,
@@ -250,7 +323,7 @@ label {
       canvas.selectionColor = 'rgba(255,0,0,0.5)';
       canvas.selectionBorderColor = 'red';
       canvas.selectionLineWidth = 5;
-      this.__canvases.push(canvas);
+
 
     };
 
@@ -258,13 +331,16 @@ label {
 
 
   squareE1.onclick = function() {
-    console.log("ส่งค่าคลิกสี่เหลี่ยมมาแล้ว");
+  //  console.log("ส่งค่าคลิกสี่เหลี่ยมมาแล้ว");
     socket.emit("squareE1", true);
    };
+
    socket.on("clientSquareE1", function(msg){
-    console.log("clientSquareE1");
+    //console.log("clientSquareE1");
+    sqn=sqn+1;
     if (msg) {
           canvas.add(new fabric.Rect({
+            id: 'sqare'+sqn,
             width: 50,
             height: 50,
             fill: 'rgba(0,200,0,0.5)',
@@ -273,7 +349,7 @@ label {
 
           }));
           canvas.item(0).lockRotation = true;
-          this.__canvases.push(canvas);
+
 
     };
 
@@ -281,36 +357,59 @@ label {
 
 
   TriangleE1.onclick = function() {
-    console.log("ส่งค่าคลิกสามเหลี่ยมมาแล้ว");
+    //console.log("ส่งค่าคลิกสามเหลี่ยมมาแล้ว");
     socket.emit("TriangleE1", true);
    };
-   socket.on("clientTriangleE1", function(msg){
-    console.log("clientTriangleE1");
-    if (msg) {
 
+
+   socket.on("clientTriangleE1", function(msg){
+  //  console.log("clientTriangleE1");
+    if (msg) {
+      trin=trin+1;
         canvas.add(new fabric.Triangle({
+          id: 'Trian'+trin,
           width: 50,
           height: 50,
           fill: 'rgba(0,0,200,0.5)',
           top: 100,
           left: 100
-        }));
-      };
 
+        }));
+        var SelectObject = function (ObjectName) {
+            canvas.getObjects().forEach(function(o) {
+              console.log(o);
+                if(o.id === ObjectName) {
+                    canvas.setActiveObject(o);
+                }
+            })
+        }
+        console.log(canvas.getObjects())
+
+      };
  	});
 
   RemoveE1.onclick = function() {
-    console.log("RemoveE1");
-    socket.emit("RemoveE1", true);
+    //console.log(canvas.getActiveObject().id);
+    socket.emit("RemoveE1", true,canvas.getActiveObject().id);
    };
-   socket.on("clientRemoveE1", function(msg){
+   socket.on("clientRemoveE1", function(active){
     console.log("clientRemoveE1");
-    if (msg) {canvas.remove(canvas.getActiveObject());
-      };
+    //if (msg) {canvas.remove(canvas.getActiveObject());
+    //  };
+    for (var i = 0; i < canvas._objects.length; i++) {
+
+      if (canvas._objects[i].id==active)
+      {
+        canvas.remove(canvas._objects[i]);
+      }
+    }
+
+    console.log(active);
 
   });
 
   clearEl.onclick = function() {
+
     console.log("clearEl");
     socket.emit("clearEl", true);
    };
@@ -318,6 +417,10 @@ label {
     console.log("clientClearEl");
     if (msg) {canvas.clear()
       };
+      textn=0;
+      trin=0;
+      sqn=0;
+      cirn=0;
 
   });
 
@@ -504,6 +607,7 @@ label {
     }
   });
 })();
+
 </script>
 
 
