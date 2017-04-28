@@ -127,7 +127,7 @@ label {
 <canvas id="c" width="400" height="300" style="border:1px solid #aaa"></canvas>
 
 <div style="display: inline-block; margin-left: 10px">
-  <button id="drawing-mode" class="btn btn-info">Enter drawing mode</button><br>
+
   <button id="clear-canvas" class="btn btn-info">Clear</button><br>
   <button id="remove1">remove</button><br>
 
@@ -148,7 +148,10 @@ label {
       <button id="shape2">square</button>
       <button id="triangle1">triangle</button>
       <button id="text1">text</button>
-      <button id="line1">line</button>
+      <button id="line1">line180</button>
+      <button id="line2">line45</button>
+      <button id="line3">line90</button>
+      <button id="line4">line135</button>
 
   </div>
 
@@ -326,6 +329,9 @@ socket.on("texting", function(msg,w,h,movingObject,mb,text,bt,ch,cw) {
       TriangleE1 = $('triangle1');
       RemoveE1 = $('remove1');
       LineE1 = $('line1');
+      LineE2= $('line2');
+      LineE3= $('line3');
+      LineE4= $('line4');
 
 
 
@@ -498,6 +504,81 @@ socket.on("texting", function(msg,w,h,movingObject,mb,text,bt,ch,cw) {
     if (msg) {
           canvas.add(new fabric.Rect({
             id: 'sqare'+sqn,
+            width: 70,
+            height: 5,
+            fill: 'rgb(0,0,0)',
+            top: 100,
+            left: 100
+
+          }));
+          canvas.item(0).lockRotation = true;
+
+
+    };
+
+ 	});
+
+  LineE2.onclick = function() {
+    socket.emit("LineE2", true);
+   };
+
+   socket.on("clientLineE2", function(msg){
+    //console.log("clientSquareE1");
+    sqn=sqn+1;
+    if (msg) {
+          canvas.add(new fabric.Rect({
+            id: 'sqare'+sqn,
+            angle:50,
+            width: 70,
+            height: 5,
+            fill: 'rgb(0,0,0)',
+            top: 100,
+            left: 100
+
+          }));
+          canvas.item(0).lockRotation = true;
+
+
+    };
+
+ 	});
+
+  LineE3.onclick = function() {
+    socket.emit("LineE3", true);
+   };
+
+   socket.on("clientLineE3", function(msg){
+    //console.log("clientSquareE1");
+    sqn=sqn+1;
+    if (msg) {
+          canvas.add(new fabric.Rect({
+            id: 'sqare'+sqn,
+            angle:90,
+            width: 70,
+            height: 5,
+            fill: 'rgb(0,0,0)',
+            top: 100,
+            left: 100
+
+          }));
+          canvas.item(0).lockRotation = true;
+
+
+    };
+
+ 	});
+
+  LineE4.onclick = function() {
+    socket.emit("LineE4", true);
+   };
+
+   socket.on("clientLineE4", function(msg){
+    //console.log("clientSquareE1");
+    sqn=sqn+1;
+    if (msg) {
+          canvas.add(new fabric.Rect({
+            id: 'sqare'+sqn,
+            angle:130,
             width: 70,
             height: 5,
             fill: 'rgb(0,0,0)',
