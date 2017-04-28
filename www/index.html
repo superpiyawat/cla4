@@ -36,8 +36,10 @@
   </head>
   <body ng-app="starter">
 
-        <ion-tab 0="" title="กระดานบอร์ด">
-          <ion-header-bar>
+<ion-tab 0="" title="กระดานบอร์ด">
+    <ion-header-bar>
+
+    </ion-header-bar>
             <!DOCTYPE html>
 <html lang="en" ng-app="">
   <head>
@@ -125,7 +127,7 @@ label {
 <canvas id="c" width="400" height="300" style="border:1px solid #aaa"></canvas>
 
 <div style="display: inline-block; margin-left: 10px">
-  <button id="drawing-mode" class="btn btn-info">Cancel drawing mode</button><br>
+  <button id="drawing-mode" class="btn btn-info">Enter drawing mode</button><br>
   <button id="clear-canvas" class="btn btn-info">Clear</button><br>
   <button id="remove1">remove</button><br>
 
@@ -146,7 +148,7 @@ label {
       <button id="shape2">square</button>
       <button id="triangle1">triangle</button>
       <button id="text1">text</button>
-      <button id="test1">test1</button>
+      <button id="line1">line</button>
 
   </div>
 
@@ -155,7 +157,7 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://192.168.43.89:3000");
+  var socket = io("http://172.20.10.2:3000");
   socket.emit("pao", "hello");
 
   var $ = function(id){return document.getElementById(id)};
@@ -186,10 +188,11 @@ label {
     var test;
     canvas.on('object:moving',function (msg) {
         var movingObject = msg.target;
+        console.log(movingObject._cacheCanvas);
         //console.log(movingObject.get('left'), movingObject.get('top'));
         temptarget = movingObject;
       socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),temptarget.id,temptarget,movingObject);
-      console.log(canvas);
+      //console.log(canvas);
       test = movingObject;
         }
   );
@@ -211,37 +214,95 @@ label {
           canvas._objects[i].left=x;
           canvas._objects[i].oCoords=mb.oCoords;
           canvas._objects[i].absoluteCoords=mb.absoluteCoords;
+          break;
         }
-        canvas.renderAll();
+
 
       }
-
+canvas.renderAll();
 
   });
   var temp2;
-  canvas.on('object:modified',function (msg) {
+  canvas.on('object:scaling',function (msg) {
       var movingObject = msg.target;
+
+      console.log("w"+movingObject.cacheWidth+"h"+movingObject.cacheHeight);
       //console.log(movingObject.get('left'), movingObject.get('top'));
       //console.log(movingObject.get('cacheWidth'),movingObject.get('cacheHeight'));
-      socket.emit("scalingObject",true, movingObject.cacheWidth, movingObject.cacheHeight, movingObject.id,movingObject,movingObject.text,movingObject._textBeforeEdit);
+      //movingObject.width=movingObject.cacheWidth;
+      //movingObject.height=movingObject.cacheHeight;
+      temp2=movingObject;
+
+      movingObject._updateCacheCanvas();
+      socket.emit("scalingObject",true, movingObject.get('width'), movingObject.get('height'), movingObject.id,movingObject,movingObject.text,movingObject._textBeforeEdit,movingObject.cacheHeight,movingObject.cacheWidth,movingObject._cacheCanvas);
     //console.log(canvas);s
       }
 );
 
-socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
+/*socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt,ch,cw,cc) {
+    socket.emit("scaling2",true,temp2.width,temp2.height,movingObject)
+ });*/
+
+
+socket.on("scaling2", function(msg,w,h,movingObject) {
   console.log("width = "+w+"Height= "+h);
   //console.log(movingObject);
   //console.log(mb);
     for (var i = 0; i < canvas._objects.length; i++) {
       if (canvas._objects[i].id==movingObject)
       {
+        canvas._objects[i].width=w;
+        canvas._objects[i].height=h;
+        //canvas._objects[i]._cacheCanvas=cc;
+      //canvas._objects[i].cacheWidth=w;
+        //canvas._objects[i].cacheHeight=h;
+        break;
+      }
 
-        canvas._objects[i].cacheWidth=w;
-        canvas._objects[i].cacheHeight=h;
+    }
+    canvas.renderAll();
+ });
+socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt,ch,cw,cc) {
+   console.log("width = "+w+"Height= "+h);
+   //console.log(movingObject);
+   //console.log(mb);
+     for (var i = 0; i < canvas._objects.length; i++) {
+       if (canvas._objects[i].id==movingObject)
+       {
+
+         canvas._objects[i]._cacheContext.translate(w / 2, h / 2);
+         canvas._objects[i].width=cw;
+         canvas._objects[i].height=ch;
+         //canvas._objects[i]._cacheCanvas=cc;
+       //canvas._objects[i].cacheWidth=w;
+         //canvas._objects[i].cacheHeight=h;
+         break;
+       }
+
+     }
+     canvas.renderAll();
+  });
+
+
+ canvas.on('object:modified',function (msg) {
+     var movingObject = msg.target;
+     //console.log(movingObject.get('left'), movingObject.get('top'));
+     //console.log(movingObject.get('cacheWidth'),movingObject.get('cacheHeight'));
+     //movingObject.width=movingObject.cacheWidth;
+     //movingObject.height=movingObject.cacheHeight;
+     socket.emit("textObject",true, movingObject.get('width'), movingObject.get('height'), movingObject.id,movingObject,movingObject.text,movingObject._textBeforeEdit,movingObject.cacheHeight,movingObject.cacheWidth);
+   //console.log(canvas);s
+     }
+);
+
+socket.on("texting", function(msg,w,h,movingObject,mb,text,bt,ch,cw) {
+    for (var i = 0; i < canvas._objects.length; i++) {
+      if (canvas._objects[i].id==movingObject)
+      {
         canvas._objects[i].text=text;
         canvas._objects[i]._savedProps=mb._saveProps;
         canvas._objects[i]._textBeforeEdit=bt;
-        canvas._updateCacheCanvas;
+        canvas._objects[i]._updateTextarea();
         break;
       }
 
@@ -264,6 +325,8 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
       textE1 = $('text1');
       TriangleE1 = $('triangle1');
       RemoveE1 = $('remove1');
+      LineE1 = $('line1');
+
 
 
   textE1.onclick = function() {
@@ -280,10 +343,10 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
     //console.log("clientTextE1");
     textn=textn+1;
  	  if (msg) {
-        canvas.add(new fabric.IText('Tap and Typ', {
+        canvas.add(new fabric.IText('Text', {
           id: 'text'+textn,
           fontFamily: 'arial black',
-          fontSize: 40,
+          fontSize: 15,
           left: 100,
           top: 100 ,
 
@@ -424,6 +487,31 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
 
   });
 
+
+  LineE1.onclick = function() {
+    socket.emit("LineE1", true);
+   };
+
+   socket.on("clientLineE1", function(msg){
+    //console.log("clientSquareE1");
+    sqn=sqn+1;
+    if (msg) {
+          canvas.add(new fabric.Rect({
+            id: 'sqare'+sqn,
+            width: 70,
+            height: 5,
+            fill: 'rgb(0,0,0)',
+            top: 100,
+            left: 100
+
+          }));
+          canvas.item(0).lockRotation = true;
+
+
+    };
+
+ 	});
+
   drawingModeEl.onclick = function() {
     console.log("drawingModeEl");
     socket.emit("drawingModeEl", true);
@@ -452,7 +540,7 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
 
   if (fabric.PatternBrush) {
     var vLinePatternBrush = new fabric.PatternBrush(canvas);
-    vLinePatternBrush.getPatternSrc = function() {
+    /*vLinePatternBrush.getPatternSrc = function() {
 
       var patternCanvas = fabric.document.createElement('canvas');
       patternCanvas.width = patternCanvas.height = 10;
@@ -467,9 +555,9 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
       ctx.stroke();
 
       return patternCanvas;
-    };
+    };*/
 
-    var hLinePatternBrush = new fabric.PatternBrush(canvas);
+  /*  var hLinePatternBrush = new fabric.PatternBrush(canvas);
     hLinePatternBrush.getPatternSrc = function() {
 
       var patternCanvas = fabric.document.createElement('canvas');
@@ -485,9 +573,9 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
       ctx.stroke();
 
       return patternCanvas;
-    };
+    };*/
 
-    var squarePatternBrush = new fabric.PatternBrush(canvas);
+    /*var squarePatternBrush = new fabric.PatternBrush(canvas);
     squarePatternBrush.getPatternSrc = function() {
 
       var squareWidth = 10, squareDistance = 2;
@@ -500,14 +588,17 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
       ctx.fillRect(0, 0, squareWidth, squareWidth);
 
       return patternCanvas;
-    };
+    };*/
+    var dw=0;
 
-    var diamondPatternBrush = new fabric.PatternBrush(canvas);
+    /*var diamondPatternBrush = new fabric.PatternBrush(canvas);
     diamondPatternBrush.getPatternSrc = function() {
+      dw=dw+1;
 
       var squareWidth = 10, squareDistance = 5;
       var patternCanvas = fabric.document.createElement('canvas');
       var rect = new fabric.Rect({
+        id: 'dw'+dw,
         width: squareWidth,
         height: squareWidth,
         angle: 45,
@@ -529,7 +620,7 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
     img.src = '../assets/honey_im_subtle.png';
 
     var texturePatternBrush = new fabric.PatternBrush(canvas);
-    texturePatternBrush.source = img;
+    texturePatternBrush.source = img;*/
   }
 /*
   $('drawing-mode-selector').onchange = function() {
@@ -560,7 +651,7 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
     }
   };
 */
-  drawingColorEl.onchange = function() {
+  /*drawingColorEl.onchange = function() {
     canvas.freeDrawingBrush.color = this.value;
   };
   drawingShadowColorEl.onchange = function() {
@@ -583,8 +674,8 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
   if (canvas.freeDrawingBrush) {
     canvas.freeDrawingBrush.color = drawingColorEl.value;
     canvas.freeDrawingBrush.width = parseInt(drawingLineWidthEl.value, 10) || 1;
-    canvas.freeDrawingBrush.shadowBlur = 0;
-  }
+    canvas.freeDrawingBrush.shadowBlur = 0
+  }*/
 })();
 </script>
 
@@ -593,7 +684,7 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
 
 
     <script>
-(function() {
+/*(function() {
   fabric.util.addListener(fabric.window, 'load', function() {
     var canvas = this.__canvas || this.canvas,
         canvases = this.__canvases || this.canvases;
@@ -606,31 +697,10 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt) {
       }
     }
   });
-})();
+})();*/
 
 </script>
 
-
-
-
   </body>
 </html>
-
-
-            <script>
-
-
-            </script>
-
-
-
-
-            </ion-header-bar></ion-tab></body></html>
-
-          <ion-content padding="true">
-
-
-
-
-
-          </ion-content>
+</ion-tab></body></html>
