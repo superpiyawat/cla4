@@ -50,6 +50,20 @@
       pre { margin-left: 15px !important }
     </style>
 
+    <style>
+         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+
+         #messages {list-style-type: none;
+          margin-top: 3px;
+          overflow: scroll;
+          height: 200px;
+          width: 100%;
+          background: #9be8d8;
+          color: #000;
+          margin-bottom: 3px;}
+
+       </style>
     <!--[if lt IE 9]>
       <script src="../lib/excanvas.js"></script>
     <![endif]-->
@@ -72,7 +86,7 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
   </head>
-  <body>
+  <body >
 
 <script>
 $(function() {
@@ -96,9 +110,7 @@ $(function() {
 </script>
 
     <div id="bd-wrapper" ng-controller="CanvasControls">
-
-
-      <style>
+<style>
 #drawing-mode {
   margin-bottom: 10px;
   vertical-align: top;
@@ -124,34 +136,33 @@ label {
 }
 </style>
 
-<canvas id="c" width="400" height="300" style="border:1px solid #aaa"></canvas>
+<canvas class="ca" id="c" width="400" height="300" style="border:1px solid #aaa"></canvas>
 
-<div style="display: inline-block; margin-left: 10px">
+  <div style="display: inline-block; margin-left: 10px; width: 186px;" >
+    <button id="clear-canvas" class="ButtonTop">Clear</button>
+    <button id="remove1" class="ButtonTop">remove</button><br>
 
-  <button id="clear-canvas" class="btn btn-info">Clear</button><br>
-  <button id="remove1">remove</button><br>
-
-
-
-
-    <br>
-</a>
-
-
-
-
+<form id="setNick">
+  User:
+  <input id="nickname" type="text" maxlength="14" class="userInput"/>
+  <input type="submit" class="SubmitUser"></input>
+</form>
+    <form id="messages"></form>
+    <form action="">
+      <input id="m" autocomplete="off" class="FormInputMessage" /><button class="FormSend">Send</button>
+    </form>
   </div>
 
 
   <div>
-      <button id="shape1">circle</button>
-      <button id="shape2">square</button>
-      <button id="triangle1">triangle</button>
-      <button id="text1">text</button>
-      <button id="line1">line180</button>
-      <button id="line2">line45</button>
-      <button id="line3">line90</button>
-      <button id="line4">line135</button>
+      <button id="shape1" class="ButtonBelow">Circle</button>
+      <button id="shape2" class="ButtonBelow">Square</button>
+      <button id="triangle1" class="ButtonBelow">Triangle</button>
+      <button id="text1" class="ButtonBelow">Text</button>
+      <button id="line1" class="ButtonBelow">Line180</button>
+      <button id="line2" class="ButtonBelow">Line45</button>
+      <button id="line3" class="ButtonBelow">Line90</button>
+      <button id="line4" class="ButtonBelow">Line135</button>
 
   </div>
 
@@ -160,8 +171,8 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://172.20.10.2:3000");
-  socket.emit("pao", "hello");
+  var socket = io("http://172.20.10.3:3000");
+  socket.emit("pao", "hello","data");
 
   var $ = function(id){return document.getElementById(id)};
 
@@ -782,6 +793,55 @@ socket.on("texting", function(msg,w,h,movingObject,mb,text,bt,ch,cw) {
 
 </script>
 
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+
+
+
+      $(function () {
+        var socket = io("http://172.20.10.3:3000");
+
+        var $nickForm = $('#setNick');
+        var $nickBox = $('#nickname');
+        $nickForm.submit(function(c){
+
+          c.preventDefault();
+          socket.emit('newuser',$nickBox.val(),function(data){
+            console.log(data);
+          });
+          $nickBox.val('');
+
+
+        });
+
+        $('form').submit(function(){
+          socket.emit('chat message', $('#m').val());
+          $('#m').val(''); //set ค่าในช่อง inputmessage ให้ว่าง
+          return false;
+        });
+
+
+          socket.on('newuser', function(data){
+
+            socket.on('chat message',function(msg){
+              if(msg==''){
+                $('#messages').append($('<li>').text(data+":connection"));
+                window.scrollTo(0, document.body.scrollHeight);
+
+              }else {
+                $('#messages').append($('<li>').text(data+":"+msg));
+                window.scrollTo(0, document.body.scrollHeight);
+  console.log(msg+data);
+              }
+
+          });
+
+
+        });
+      });
+    </script>
   </body>
 </html>
 </ion-tab></body></html>
