@@ -1,1 +1,65 @@
 /* Empty. Add your own CSS if you like */
+.ButtonBelow{
+background-color: #fe6a6a;
+border: none;
+color: white;
+padding: 3px 12px;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+font-size: 16px;
+margin: 4px 0px;
+cursor: pointer;
+
+}
+.ButtonTop{
+background-color: #fe6a6a;
+border: none;
+color: white;
+padding: 3px 12px;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+font-size: 16px;
+margin: 2px 2px;
+cursor: pointer;
+
+}
+.FormInputMessage{
+  padding: 10px;
+  border-style: ridge;
+  width: 69%;
+  margin-right: -3.5%;
+  height: 0px;
+  margin-top: 2px;
+}
+.FormSend{
+  width: 29%;
+  background-color: #fe6a6a;
+  border: none;
+  color: #fff;
+  margin-top: 2.5px;
+  margin-left: 7px;
+  padding: 2px;
+  }
+.userInput{
+  background: #90EE90;
+  padding: -12px;
+  width: 52%;
+  margin-top: 4px;
+  height: 26px;
+  margin-bottom: 2px;
+  }
+  .SubmitUser{
+    background-color: #fe6a6a;
+    border: none;
+    color: white;
+    padding: 4.4px 5px;
+    text-align: center;
+    padding-top: 3px;
+    padding-bottom: 5px;
+    font-size: 12px;
+    cursor: pointer;
+
+  }
+}
