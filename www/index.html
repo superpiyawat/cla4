@@ -107,6 +107,8 @@ $(function() {
     !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
   }
 })();
+
+
 </script>
 
     <div id="bd-wrapper" ng-controller="CanvasControls">
@@ -145,12 +147,14 @@ label {
 <form id="setNick">
   User:
   <input id="nickname" type="text" maxlength="14" class="userInput"/>
-  <input type="submit" class="SubmitUser"></input>
+  <input type="button" id="su" value="Submit" onclick="sm()" class="SubmitUser"></input>
 </form>
     <form id="messages"></form>
     <form action="">
-      <input id="m" autocomplete="off" class="FormInputMessage" /><button class="FormSend">Send</button>
+      <input id="m" autocomplete="off" class="FormInputMessage" />
+      <input type="button" id="ms" value="Submit" onclick="su()"class="FormSend"></input>
     </form>
+
   </div>
 
 
@@ -798,49 +802,37 @@ socket.on("texting", function(msg,w,h,movingObject,mb,text,bt,ch,cw) {
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
 
-
-
-      $(function () {
-        var socket = io("http://172.20.10.3:3000");
-
-        var $nickForm = $('#setNick');
+var socket = io("http://172.20.10.3:3000");
+    var $nickForm = $('#setNick');
+    var $nickBox = $('#nickname');
         var $nickBox = $('#nickname');
-        $nickForm.submit(function(c){
-
-          c.preventDefault();
-          socket.emit('newuser',$nickBox.val(),function(data){
-            console.log(data);
-          });
-          $nickBox.val('');
-
-
-        });
-
-        $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          $('#m').val(''); //set ค่าในช่อง inputmessage ให้ว่าง
-          return false;
-        });
+        var username ="###############";
+        function sm() {
+        username = $nickBox.val();
+        //alert('Your name is'+username);
+        //alert(username);
+        $('#messages').append($('<li>').text(username+":connection"));
+        window.scrollTo(0, document.body.scrollHeight);
+        $nickBox.val('');
+        }
+        function su() {
+        socket.emit('chat message',$('#m').val(),username);
+        $('#m').val(''); //set ค่าในช่อง inputmessage ให้ว่าง
+        }
 
 
-          socket.on('newuser', function(data){
-
-            socket.on('chat message',function(msg){
+            socket.on('chat message',function(msg,use){
               if(msg==''){
-                $('#messages').append($('<li>').text(data+":connection"));
-                window.scrollTo(0, document.body.scrollHeight);
+
+
 
               }else {
-                $('#messages').append($('<li>').text(data+":"+msg));
+                $('#messages').append($('<li>').text(use+":"+msg));
                 window.scrollTo(0, document.body.scrollHeight);
-  console.log(msg+data);
               }
 
           });
 
-
-        });
-      });
     </script>
   </body>
 </html>
