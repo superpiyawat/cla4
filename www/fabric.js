@@ -2,6 +2,9 @@
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
  var socket = io("http://192.168.1.29:3000");
  socket.emit("pao", "fabric");
+var ismove=1;
+var user=1;
+var tn=1;
 
 var fabric = fabric || { version: "1.7.3" };
 if (typeof exports !== 'undefined') {
@@ -9095,7 +9098,18 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
      * @param {Number} y pointer's y coordinate
      * @return {Boolean} true if the translation occurred
      */
+
     _translateObject: function (x, y) {
+      socket.on("translateObjectOn", function(n){
+        if(ismove!=1)
+        {
+          tn=n;
+          user=n;
+          ismove=1;
+        }
+
+      });
+      if (ismove==true&&user==tn){
       var transform = this._currentTransform;
       var target = transform.target;
       var newLeft = x - transform.offsetX,
@@ -9107,13 +9121,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
             x: newLeft,
             y:newTop
           }
-          socket.emit("translateObject", Object);
+        }
 
       //var target = transform.target;
-      socket.on("translateObjectOn", function(Object){
-    		console.log('on',Object.target,Object.x,Object.y);
 
-    	});
 
       target=Object.target;
       newLeft=Object.x;
@@ -10784,6 +10795,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
       transform.actionPerformed && this.renderAll();
     },
+
 
     /**
      * @private
