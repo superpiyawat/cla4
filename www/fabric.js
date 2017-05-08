@@ -2,7 +2,7 @@
  /*! Fabric.js Copyright 2008-2015, Printio (Juriy Zaytsev, Maxim Chernyak) */
  var socket = io("http://192.168.1.29:3000");
  socket.emit("pao", "fabric");
-var ismove=1;
+var ismove=2;
 var user=1;
 var tn=1;
 
@@ -9101,15 +9101,22 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fab
 
     _translateObject: function (x, y) {
       socket.on("translateObjectOn", function(n){
-        if(ismove!=1)
+        if(ismove==2)
         {
           tn=n;
           user=n;
           ismove=1;
         }
+        else {
+          user=n;
+        }
 
       });
-      if (ismove==true&&user==tn){
+      socket.on("translateObjectOn2", function(n){
+        ismove=n;
+
+      });
+      if (user==tn){
       var transform = this._currentTransform;
       var target = transform.target;
       var newLeft = x - transform.offsetX,
