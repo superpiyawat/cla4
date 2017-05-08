@@ -313,6 +313,7 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt,ch,cw,cc) {
      //movingObject.height=movingObject.cacheHeight;
      socket.emit("textObject",true, movingObject.get('width'), movingObject.get('height'), movingObject.id,movingObject,movingObject.text,movingObject._textBeforeEdit,movingObject.cacheHeight,movingObject.cacheWidth);
    //console.log(canvas);s
+   socket.emit("translateObject2", 2);
      }
 );
 
