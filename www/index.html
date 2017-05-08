@@ -200,11 +200,12 @@ label {
 
      }
   	});
-
     //ส่งค่าพิกัดไป server ครับ
     var temptarget;
     var test;
+    var ismove = false;
     canvas.on('object:moving',function (msg) {
+
         var movingObject = msg.target;
         console.log(movingObject._cacheCanvas);
         //console.log(movingObject.get('left'), movingObject.get('top'));
@@ -212,7 +213,8 @@ label {
       socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),temptarget.id,temptarget,movingObject);
       //console.log(canvas);
       test = movingObject;
-        }
+      socket.emit("translateObject", username);
+      }
   );
 
   socket.on("m2", function(msg,x,y,movingObject,mtr,mb){
@@ -304,6 +306,7 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt,ch,cw,cc) {
 
  canvas.on('object:modified',function (msg) {
      var movingObject = msg.target;
+     var ismove = false;
      //console.log(movingObject.get('left'), movingObject.get('top'));
      //console.log(movingObject.get('cacheWidth'),movingObject.get('cacheHeight'));
      //movingObject.width=movingObject.cacheWidth;
