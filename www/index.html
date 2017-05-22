@@ -175,7 +175,7 @@ label {
 
 
 <script id="main">(function() {
-  var socket = io("http://172.20.10.3:3000");
+  var socket = io("http://10.199.66.28:3000");
   socket.emit("pao", "hello","data");
 
   var $ = function(id){return document.getElementById(id)};
@@ -200,27 +200,26 @@ label {
 
      }
   	});
+
     //ส่งค่าพิกัดไป server ครับ
     var temptarget;
     var test;
-    var ismove = false;
     canvas.on('object:moving',function (msg) {
-
         var movingObject = msg.target;
         console.log(movingObject._cacheCanvas);
         //console.log(movingObject.get('left'), movingObject.get('top'));
         temptarget = movingObject;
+      socket.emit("ismove2", true,username);
       socket.emit("movingObject", true,movingObject.get('left'),movingObject.get('top'),temptarget.id,temptarget,movingObject);
       //console.log(canvas);
       test = movingObject;
-      socket.emit("translateObject", username);
-      }
+        }
   );
 
   socket.on("m2", function(msg,x,y,movingObject,mtr,mb){
     temptarget= movingObject;
-    //console.log(canvas._objects[0].id);
-    //console.log(movingObject);
+    //console.log("canvas_object:"+canvas._objects[0].id);
+    //console.log("move:"+movingObject);
     //console.log(mtr);
      //console.log("moving"+" X update="+x+" Y update"+y);
       //console.log(test);
@@ -229,16 +228,15 @@ label {
 
         if (canvas._objects[i].id==movingObject)
         {
-
           canvas._objects[i].top=y;
           canvas._objects[i].left=x;
           canvas._objects[i].oCoords=mb.oCoords;
           canvas._objects[i].absoluteCoords=mb.absoluteCoords;
+          canvas._objects[i].selectable=false;
           break;
         }
-
-
       }
+
 canvas.renderAll();
 
   });
@@ -299,6 +297,7 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt,ch,cw,cc) {
          break;
        }
 
+
      }
      canvas.renderAll();
   });
@@ -306,14 +305,13 @@ socket.on("scaling", function(msg,w,h,movingObject,mb,text,bt,ch,cw,cc) {
 
  canvas.on('object:modified',function (msg) {
      var movingObject = msg.target;
-     var ismove = false;
      //console.log(movingObject.get('left'), movingObject.get('top'));
      //console.log(movingObject.get('cacheWidth'),movingObject.get('cacheHeight'));
      //movingObject.width=movingObject.cacheWidth;
      //movingObject.height=movingObject.cacheHeight;
+     socket.emit("ismove3", false);
      socket.emit("textObject",true, movingObject.get('width'), movingObject.get('height'), movingObject.id,movingObject,movingObject.text,movingObject._textBeforeEdit,movingObject.cacheHeight,movingObject.cacheWidth);
    //console.log(canvas);s
-   socket.emit("translateObject2", 2);
      }
 );
 
@@ -321,10 +319,12 @@ socket.on("texting", function(msg,w,h,movingObject,mb,text,bt,ch,cw) {
     for (var i = 0; i < canvas._objects.length; i++) {
       if (canvas._objects[i].id==movingObject)
       {
+        canvas._objects[i].selectable=true;
         canvas._objects[i].text=text;
         canvas._objects[i]._savedProps=mb._saveProps;
         canvas._objects[i]._textBeforeEdit=bt;
         canvas._objects[i]._updateTextarea();
+
         break;
       }
 
@@ -806,7 +806,7 @@ socket.on("texting", function(msg,w,h,movingObject,mb,text,bt,ch,cw) {
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
 
-var socket = io("http://172.20.10.3:3000");
+var socket = io("http://10.199.66.28:3000");
     var $nickForm = $('#setNick');
     var $nickBox = $('#nickname');
         var $nickBox = $('#nickname');
